@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentipet - Pets Sociais</title>
+  <meta name="description" content="Conecte-se através dos pets no Sentipet - A rede social mais fofa do mundo!">
+  <meta name="keywords" content="pets, social, chat, animais, virtual">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-pet">🐾</div>
+      <h2>Sentipet</h2>
+      <p>Conectando ao mundo dos pets...</p>
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <h1>🐾 Sentipet</h1>
+      <p class="subtitle">Conecte-se através dos pets</p>
+      <div class="header-actions">
+        <button id="settingsBtn" class="icon-btn">⚙️</button>
+        <button id="notificationsBtn" class="icon-btn">🔔</button>
+      </div>
+    </header>
+    
+    <main>
+      <!-- Tela de Login/Registro -->
+      <div id="auth-screen" class="auth-screen">
+        <div class="auth-form">
+          <div class="auth-logo">
+            <div class="logo-pet">🐾</div>
+            <h2>Bem-vindo ao Sentipet!</h2>
+            <p>A rede social mais fofa do mundo</p>
+          </div>
+          <div class="input-group">
+            <input type="text" id="username" placeholder="Seu nome de usuário" maxlength="20" />
+            <div class="input-validation"></div>
+          </div>
+          <button id="loginBtn" class="primary-btn">
+            <span class="btn-text">Entrar</span>
+            <span class="btn-loading">Carregando...</span>
+          </button>
+          <div class="auth-footer">
+            <p>✨ Criado com amor para conectar pets</p>
+            <p class="connection-status" id="connection-status">Conectando...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tela Principal -->
+      <div id="main-screen" class="main-screen hidden">
+        <!-- Seleção de Pet -->
+        <div id="pet-selection" class="pet-selection">
+          <div class="selection-header">
+            <h3>Escolha seu pet</h3>
+            <p>Selecione o pet que mais combina com você!</p>
+          </div>
+          <div class="pets-grid">
+            <div class="pet-option" data-pet="dog">
+              <div class="pet-emoji">🐕</div>
+              <div class="pet-name">Cachorro</div>
+              <div class="pet-desc">Leal e brincalhão</div>
+            </div>
+            <div class="pet-option" data-pet="cat">
+              <div class="pet-emoji">🐱</div>
+              <div class="pet-name">Gato</div>
+              <div class="pet-desc">Independente e elegante</div>
+            </div>
+            <div class="pet-option" data-pet="rabbit">
+              <div class="pet-emoji">🐰</div>
+              <div class="pet-name">Coelho</div>
+              <div class="pet-desc">Fofo e tranquilo</div>
+            </div>
+            <div class="pet-option" data-pet="bird">
+              <div class="pet-emoji">🐦</div>
+              <div class="pet-name">Pássaro</div>
+              <div class="pet-desc">Livre e cantante</div>
+            </div>
+            <div class="pet-option" data-pet="hamster">
+              <div class="pet-emoji">🐹</div>
+              <div class="pet-name">Hamster</div>
+              <div class="pet-desc">Pequeno e ativo</div>
+            </div>
+            <div class="pet-option" data-pet="fish">
+              <div class="pet-emoji">🐠</div>
+              <div class="pet-name">Peixe</div>
+              <div class="pet-desc">Calmo e observador</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tela Home - Interação com Pet -->
+        <div id="home-screen" class="home-screen hidden">
+          <div class="user-info">
+            <div class="user-details">
+              <div class="user-avatar">
+                <span id="current-pet-emoji">🐾</span>
+              </div>
+              <div class="user-info-text">
+                <span id="current-user"></span>
+                <span class="user-pet-name" id="current-pet"></span>
+              </div>
+              <div class="mood-indicator">
+                <span id="current-mood">😊</span>
+                <span id="mood-text">Feliz</span>
+              </div>
+            </div>
+            <div class="user-actions">
+              <button id="profileBtn" class="icon-btn">👤</button>
+              <button id="logoutBtn" class="icon-btn">🚪</button>
+            </div>
+          </div>
+
+          <!-- Pet Principal -->
+          <div class="pet-main">
+            <div class="pet-display">
+              <div class="pet-avatar" id="pet-avatar">🐾</div>
+              <div class="pet-status">
+                <h3 id="pet-name">Seu Pet</h3>
+                <p id="pet-mood">Está feliz hoje!</p>
+              </div>
+            </div>
+
+            <!-- Interações com Pet -->
+            <div class="pet-interactions">
+              <h4>Interaja com seu pet</h4>
+              <div class="interaction-buttons">
+                <button class="interaction-btn" data-action="play">
+                  <span class="interaction-emoji">🎾</span>
+                  <span class="interaction-name">Brincar</span>
+                </button>
+                <button class="interaction-btn" data-action="feed">
+                  <span class="interaction-emoji">🍖</span>
+                  <span class="interaction-name">Alimentar</span>
+                </button>
+                <button class="interaction-btn" data-action="pet">
+                  <span class="interaction-emoji">🤗</span>
+                  <span class="interaction-name">Acariciar</span>
+                </button>
+                <button class="interaction-btn" data-action="hug">
+                  <span class="interaction-emoji">🫂</span>
+                  <span class="interaction-name">Abraçar</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Navegação para Praças -->
+            <div class="plaza-navigation">
+              <h4>Vá para as praças e conheça outros pets!</h4>
+              <div class="plaza-buttons">
+                <button class="plaza-btn" data-plaza="praca">
+                  <div class="plaza-icon">🏛️</div>
+                  <div class="plaza-info">
+                    <div class="plaza-name">Praça dos Pets</div>
+                    <div class="plaza-desc">Conheça novos amigos</div>
+                  </div>
+                </button>
+                <button class="plaza-btn" data-plaza="gatos">
+                  <div class="plaza-icon">🐱</div>
+                  <div class="plaza-info">
+                    <div class="plaza-name">Clube dos Gatos</div>
+                    <div class="plaza-desc">Exclusivo para gatos</div>
+                  </div>
+                </button>
+                <button class="plaza-btn" data-plaza="cachorros">
+                  <div class="plaza-icon">🐕</div>
+                  <div class="plaza-info">
+                    <div class="plaza-name">Parque dos Cachorros</div>
+                    <div class="plaza-desc">Exclusivo para cachorros</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Relacionamentos -->
+            <div class="relationships">
+              <h4>Seus Relacionamentos</h4>
+              <div id="relationships-list" class="relationships-list">
+                <div class="no-relationships">
+                  <p>Você ainda não tem relacionamentos</p>
+                  <p>Vá para as praças e conheça outros pets! 🐾</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tela de Praça - Chat Social -->
+        <div id="plaza-screen" class="plaza-screen hidden">
+          <div class="plaza-header">
+            <button id="back-to-home" class="back-btn">← Voltar</button>
+            <div class="plaza-info">
+              <span id="plaza-name">🏛️ Praça dos Pets</span>
+              <span id="online-count">0 online</span>
+            </div>
+          </div>
+
+          <div class="chat-container">
+            <div id="chat-messages" class="chat-messages"></div>
+            <form id="chat-form" class="chat-input">
+              <input type="text" id="message-input" placeholder="Digite sua mensagem..." maxlength="200" />
+              <button type="submit" class="send-btn">📤</button>
+            </form>
+          </div>
+
+          <!-- Lista de Usuários Online -->
+          <div class="online-users">
+            <h4>Pets Online</h4>
+            <div id="users-list" class="users-list"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de Configurações -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ Configurações</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-group">
+          <label>Notificações</label>
+          <label class="toggle">
+            <input type="checkbox" id="notifications-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-group">
+          <label>Som</label>
+          <label class="toggle">
+            <input type="checkbox" id="sound-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-group">
+          <label>Tema Escuro</label>
+          <label class="toggle">
+            <input type="checkbox" id="dark-mode-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificações -->
+  <div id="notifications-container" class="notifications-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
