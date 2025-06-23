@@ -36,7 +36,8 @@ app.get('/api/status', (req, res) => {
     status: 'online', 
     users: users.size, 
     rooms: Array.from(rooms.keys()),
-    version: '1.0.0'
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -380,12 +381,22 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Rota de health check para Vercel
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Sentipet Server rodando na porta ${PORT}`);
   console.log(`📱 Acesse: http://localhost:${PORT}`);
   console.log(`🌐 Status: http://localhost:${PORT}/api/status`);
+  console.log(`💚 Health: http://localhost:${PORT}/api/health`);
 });
 
 // Graceful shutdown
@@ -395,4 +406,7 @@ process.on('SIGTERM', () => {
     console.log('✅ Servidor encerrado');
     process.exit(0);
   });
-}); 
+});
+
+// Exportar para Vercel
+module.exports = app; 
